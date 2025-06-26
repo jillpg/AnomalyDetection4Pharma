@@ -1,0 +1,22 @@
+name: CI Pipeline
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install papermill nbconvert
+      - name: Run unit tests
+        run: pytest --maxfail=1 --disable-warnings -q
+      - name: Validate notebooks
+        run: |
+          papermill notebooks/01_EDA_and_feature_gen.ipynb /dev/null
+          papermill notebooks/02_baseline_classic.ipynb /dev/null
+          papermill notebooks/03_lstm_autoencoder.ipynb /dev/null
