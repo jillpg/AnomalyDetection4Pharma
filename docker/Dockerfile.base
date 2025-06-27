@@ -1,0 +1,38 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Dockerfile.base (CPU-only)
+# ─────────────────────────────────────────────────────────────────────────────
+FROM openjdk:11-jdk-slim
+
+# Etiqueta de la imagen
+LABEL maintainer="tu@empresa.com" \
+      version="1.0" \
+      description="Base image with Java, Python3.9, PySpark, CPU-only PyTorch and ML libs"
+
+# 1. Instalar Python3.9 y utilidades
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      python3.9 python3.9-dev python3-pip \
+      build-essential \
+ && rm -rf /var/lib/apt/lists/* \
+ # Asegurarnos de que 'python3' apunte a python3.9
+ && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1 \
+ && python3 -m pip install --upgrade pip
+
+
+# 2. Instalar PySpark y PyTorch (CPU-only)
+RUN pip install --no-cache-dir \
+      pyspark==3.3.2 \
+      torch==2.0.1+cpu \
+      -f https://download.pytorch.org/whl/torch_stable.html
+
+
+# 3. Instalar dependencias adicionales desde requirements.txt
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# 4. Directorio de trabajo
+WORKDIR /app
+
+# 5. Entrypoint por defecto
+ENTRYPOINT ["bash"]
+# ─────────────────────────────────────────────────────────────────────────────
