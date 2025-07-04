@@ -1,38 +1,60 @@
-# ─────────────────────────────────────────────────────────────────────────────
-#  Dockerfile.base (CPU-only)
-# ─────────────────────────────────────────────────────────────────────────────
+# ───────────────────────────────────────────────────────────────────
+# Base image: Java + Python3.9 + Spark + PySpark + PyTorch + ML
+# ───────────────────────────────────────────────────────────────────
 FROM openjdk:11-jdk-slim
 
-# Etiqueta de la imagen
 LABEL maintainer="tu@empresa.com" \
       version="1.0" \
-      description="Base image with Java, Python3.9, PySpark, CPU-only PyTorch and ML libs"
+      description="Base image with Spark, Python 3.9, PySpark, PyTorch and ML libs"
 
-# 1. Instalar Python3.9 y utilidades
-RUN apt-get update \
- && apt-get install -y --no-install-recommends \
-      python3.9 python3.9-dev python3-pip \
-      build-essential \
- && rm -rf /var/lib/apt/lists/* \
- # Asegurarnos de que 'python3' apunte a python3.9
- && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1 \
- && python3 -m pip install --upgrade pip
+ENV PYTHONUNBUFFERED=1
+ENV PYSPARK_PYTHON=python3
+ENV SPARK_VERSION=3.3.2
+ENV HADOOP_VERSION=3
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+ENV PYTHONPATH=$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.9.5-src.zip:$PYTHONPATH
 
+# ---------------------
+# Instalar dependencias básicas de sistema
+# ---------------------
+RUN set -eux; \
+    for i in 1 2 3; do apt-get update && break || (echo "apt-get update fallo intento $i, esperando 5s..." && sleep 5); done; \
+    for i in 1 2 3; do apt-get install -y --no-install-recommends \
+        python3.9 python3.9-dev python3-pip \
+        curl bash git wget ca-certificates procps \
+        && break || (echo "apt-get install fallo intento $i, esperando 5s..." && sleep 5); done; \
+    rm -rf /var/lib/apt/lists/*
 
-# 2. Instalar PySpark y PyTorch (CPU-only)
-RUN pip install --no-cache-dir \
-      pyspark==3.3.2 \
-      torch==2.0.1+cpu \
-      -f https://download.pytorch.org/whl/torch_stable.html
+# ---------------------
+# Configurar python y actualizar pip con reintentos
+# ---------------------
+RUN set -eux; \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1; \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1; \
+    for i in 1 2 3; do python3 -m pip install --upgrade pip && break || (echo "pip upgrade fallo intento $i, esperando 5s..." && sleep 5); done
 
+# ---------------------
+# Descargar e instalar Spark con reintentos
+# ---------------------
+RUN set -eux; \
+    for i in 1 2 3; do \
+      curl -fsSL https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz \
+      | tar -xz -C /opt/ && \
+      mv /opt/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION} ${SPARK_HOME} && break || \
+      (echo "Descarga de Spark fallo intento $i, esperando 5s..." && sleep 5); \
+    done
 
-# 3. Instalar dependencias adicionales desde requirements.txt
-COPY requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
+# ---------------------
+# Instalar librerías Python con reintentos
+# ---------------------
+COPY requirements.txt /tmp/requirements.txt
+RUN set -eux; \
+    for i in 1 2 3; do \
+      pip install --no-cache-dir -r /tmp/requirements.txt && break || \
+      (echo "pip install fallo intento $i, esperando 5s..." && sleep 5); \
+    done
 
-# 4. Directorio de trabajo
 WORKDIR /app
 
-# 5. Entrypoint por defecto
-ENTRYPOINT ["bash"]
-# ─────────────────────────────────────────────────────────────────────────────
+CMD ["/bin/bash"]

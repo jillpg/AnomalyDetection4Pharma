@@ -1,5 +1,16 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
 pandas
 moto
 boto3
 pytest
+python-dotenv
 dotenv
+numpy
+scikit-learn
+matplotlib
+seaborn
+pyspark==3.3.2
+torch
+botocore
+requests

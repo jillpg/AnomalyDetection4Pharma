@@ -1,24 +1,54 @@
-version: "3.8"
+version: "3.9"
+
 services:
   spark-master:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.base
-    command: start-master.sh
+      context: ..
+      dockerfile: docker/Dockerfile.base
+    container_name: spark-master
+    hostname: spark-master
+    environment:
+      - SPARK_HOME=/opt/spark
+    command: bash -c "/opt/spark/sbin/start-master.sh && tail -f /dev/null"
     ports:
-      - "7077:7077"
-      - "8080:8080"
+      - "7077:7077" # Puerto interno de Spark
+      - "8080:8080" # UI Web
+    networks:
+      - spark-net
+    volumes:
+      - ../src:/app/src
+      - ../data:/app/data
+
   spark-worker:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.base
-    command: start-worker.sh spark://spark-master:7077
+      context: ..
+      dockerfile: docker/Dockerfile.base
+    container_name: spark-worker
+    hostname: spark-worker
+    environment:
+      - SPARK_HOME=/opt/spark
+    command: bash -c "/opt/spark/sbin/start-worker.sh spark://spark-master:7077 && tail -f /dev/null"
     depends_on:
       - spark-master
+    networks:
+      - spark-net
+
   notebook:
     image: jupyter/pyspark-notebook
-    volumes:
-      - ./src:/home/jovyan/src
-      - ./notebooks:/home/jovyan/notebooks
+    container_name: spark-notebook
     ports:
       - "8888:8888"
+    volumes:
+      - ../notebooks:/home/jovyan/work/notebooks
+      - ../src:/home/jovyan/work/src
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - JUPYTER_TOKEN=changeme
+    depends_on:
+      - spark-master
+    networks:
+      - spark-net
+
+networks:
+  spark-net:
+    driver: bridge
