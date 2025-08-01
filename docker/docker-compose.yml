@@ -1,54 +1,43 @@
 version: "3.9"
 
 services:
-  spark-master:
+  jupyter-pyspark:
     build:
       context: ..
       dockerfile: docker/Dockerfile.base
-    container_name: spark-master
-    hostname: spark-master
-    environment:
-      - SPARK_HOME=/opt/spark
-    command: bash -c "/opt/spark/sbin/start-master.sh && tail -f /dev/null"
-    ports:
-      - "7077:7077" # Puerto interno de Spark
-      - "8080:8080" # UI Web
-    networks:
-      - spark-net
-    volumes:
-      - ../src:/app/src
-      - ../data:/app/data
-
-  spark-worker:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.base
-    container_name: spark-worker
-    hostname: spark-worker
-    environment:
-      - SPARK_HOME=/opt/spark
-    command: bash -c "/opt/spark/sbin/start-worker.sh spark://spark-master:7077 && tail -f /dev/null"
-    depends_on:
-      - spark-master
-    networks:
-      - spark-net
-
-  notebook:
-    image: jupyter/pyspark-notebook
-    container_name: spark-notebook
+    container_name: jupyter-pyspark
     ports:
       - "8888:8888"
     volumes:
-      - ../notebooks:/home/jovyan/work/notebooks
-      - ../src:/home/jovyan/work/src
+      - ..:/app
     environment:
-      - SPARK_MASTER=spark://spark-master:7077
+      - PYSPARK_PYTHON=/usr/local/bin/python
+      - PYSPARK_DRIVER_PYTHON=/usr/local/bin/python
       - JUPYTER_TOKEN=changeme
-    depends_on:
-      - spark-master
+
     networks:
-      - spark-net
+      - spark-network
+      - minio-net
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest # corregido “lastest” → “latest”
+    ports:
+      - "9000:9000" # acceso S3 API
+      - "9001:9001" # consola web de MinIO (opcional pero muy útil)
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - minio-net
+
+volumes:
+  minio_data:
 
 networks:
-  spark-net:
+  minio-net:
+  spark-network:
     driver: bridge

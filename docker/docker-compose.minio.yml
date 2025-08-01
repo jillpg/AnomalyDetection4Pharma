@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+  minio:
+    image: minio/minio:latest # corregido “lastest” → “latest”
+    ports:
+      - "9000:9000" # acceso S3 API
+      - "9001:9001" # consola web de MinIO (opcional pero muy útil)
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+volumes:
+  minio_data:

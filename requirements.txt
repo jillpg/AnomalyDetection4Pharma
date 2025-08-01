@@ -10,7 +10,9 @@ numpy
 scikit-learn
 matplotlib
 seaborn
-pyspark==3.3.2
+pyspark
 torch
 botocore
 requests
+jupyter
+findspark
