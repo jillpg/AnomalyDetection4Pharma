@@ -43,14 +43,15 @@ def test_validate_individual_csv_success(tmp_path, capsys):
     bucket = "validation-bucket"
     key = "aux/process.csv"
     s3.create_bucket(Bucket=bucket)
-    s3.put_object(Bucket=bucket, Key=key, Body=b"batch,code\n1,ABC\n2,DEF\n")
+    # Usar separador ';' porque validate_individual_csv lee con sep=';'
+    s3.put_object(Bucket=bucket, Key=key, Body=b"batch;code\n1;ABC\n2;DEF\n")
 
     # El módulo usa BUCKET_NAME para inferir el bucket
     vd.BUCKET_NAME = bucket
 
     validate_individual_csv(key, tmpdir=str(tmp_path), expected_cols=["batch"])
     out = capsys.readouterr().out
-    assert "OK" in out
+    assert "✔ Todas las columnas esperadas presentes" in out
     assert "duplicados" not in out
 
 
