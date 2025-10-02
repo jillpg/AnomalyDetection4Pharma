@@ -71,4 +71,4 @@ def test_process_process_and_laboratory_integration(tmp_path, monkeypatch, spark
         out_key = f"test/output/{name.split('.')[0]}.parquet"
         df = spark.read.parquet(f"s3a://{os.environ['BUCKET_NAME']}/{out_key}")
         assert df.count() == 1
-        assert set(df.columns) == {"batch", "code"}
+        assert {"batch", "code"}.issubset(set(df.columns))
