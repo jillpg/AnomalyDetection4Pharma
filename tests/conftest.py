@@ -1,3 +1,4 @@
+# tests/conftest.py
 import pytest
 import os
 import boto3
@@ -56,19 +57,14 @@ def spark():
         .appName("ETLTest")
         .master("local[2]")
         # Incluir paquete Hadoop AWS compatible
-        .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.4")
+        .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.3")
         # Configuración S3A para MinIO
         .config("spark.hadoop.fs.s3a.endpoint", endpoint_host)
         .config("spark.hadoop.fs.s3a.path.style.access", "true")
         .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
         .config("spark.hadoop.fs.s3a.access.key", os.environ["AWS_ACCESS_KEY_ID"])
-        .config("spark.hadoop.fs.s3a.secret.key", os.environ["AWS_SECRET_ACCESS_KEY"]) 
-        .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider")
+        .config("spark.hadoop.fs.s3a.secret.key", os.environ["AWS_SECRET_ACCESS_KEY"])
         .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false")
-        # Evitar parsers de duraciones con sufijos; usar milisegundos explícitos
-        .config("spark.hadoop.fs.s3a.connection.establish.timeout", "5000")
-        .config("spark.hadoop.fs.s3a.connection.timeout", "60000")
-        .config("spark.hadoop.fs.s3a.socket.timeout", "60000")
         .config("spark.ui.enabled", "false")
         .getOrCreate()
     )
