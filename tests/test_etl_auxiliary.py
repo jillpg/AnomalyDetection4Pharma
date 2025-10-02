@@ -21,6 +21,7 @@ def test_process_normalization_integration(tmp_path, monkeypatch, spark):
     monkeypatch.setenv('AWS_SECRET_ACCESS_KEY', 'minioadmin')
     monkeypatch.setenv('AWS_REGION', 'us-east-1')
     monkeypatch.setenv('BUCKET_NAME', 'test-bucket')
+    monkeypatch.setenv('MINIO_ENDPOINT', 'http://minio:9000')
     monkeypatch.setenv('S3_PATH_INTERIM', 'test/output')
 
     # Crear CSV local
@@ -50,6 +51,7 @@ def test_process_process_and_laboratory_integration(tmp_path, monkeypatch, spark
     monkeypatch.setenv('AWS_SECRET_ACCESS_KEY', 'minioadmin')
     monkeypatch.setenv('AWS_REGION', 'us-east-1')
     monkeypatch.setenv('BUCKET_NAME', 'test-bucket')
+    monkeypatch.setenv('MINIO_ENDPOINT', 'http://minio:9000')
     monkeypatch.setenv('S3_PATH_INTERIM', 'test/output')
 
     for name, func in [("process.csv", process_process), ("laboratory.csv", process_laboratory)]:
