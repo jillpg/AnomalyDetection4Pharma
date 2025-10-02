@@ -1,22 +1,64 @@
-name: CI Pipeline
-on: [push, pull_request]
+name: CI
+
+on:
+  push:
+  pull_request:
+
 jobs:
-  build:
+  unit:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: testing
+      AWS_SECRET_ACCESS_KEY: testing
+      AWS_REGION: us-east-1
+      BUCKET_NAME: test-bucket
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup Python
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install papermill nbconvert moto[all]
+      - name: Run unit tests
+        run: pytest -m unit --maxfail=1 --disable-warnings -q
+      - name: Validate notebooks
+        run: |
+          papermill notebooks/01_EDA_and_feature_gen.ipynb /dev/null
+          papermill notebooks/02_baseline_classic.ipynb /dev/null
+          papermill notebooks/03_lstm_autoencoder.ipynb /dev/null
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: unit
+    services:
+      minio:
+        image: minio/minio:latest
+        ports:
+          - 9000:9000   # API S3
+          - 9001:9001   # Consola web
+        env:
+          MINIO_ROOT_USER: minioadmin
+          MINIO_ROOT_PASSWORD: minioadmin
+        options: >-
+          --health-cmd "curl -f http://localhost:9000/minio/health/ready || exit 1"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+
+    env:
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+      AWS_REGION: us-east-1
+      BUCKET_NAME: test-bucket
+      MINIO_ENDPOINT: http://localhost:9000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
           pip install papermill nbconvert
-      - name: Run unit tests
-        run: pytest --maxfail=1 --disable-warnings -q
-      - name: Validate notebooks
-        run: |
-          papermill notebooks/01_EDA_and_feature_gen.ipynb /dev/null
-          papermill notebooks/02_baseline_classic.ipynb /dev/null
-          papermill notebooks/03_lstm_autoencoder.ipynb /dev/null
+      - name: Run integration tests
+        run: pytest -m integration --maxfail=1 --disable-warnings -q

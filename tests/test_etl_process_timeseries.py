@@ -5,12 +5,14 @@ import tempfile
 from pyspark.sql import Row
 from pathlib import Path
 import sys
+import pytest
 # Asegurar que 'src' esté en sys.path
 root_dir = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(root_dir / 'src'))
 from etl_process_timeseries import load_and_combine_process_files
 from helpers import upload_csv_to_s3
 
+@pytest.mark.integration
 def test_load_and_correct_timestamps(spark):
     # 1. crear CSV local
     with tempfile.TemporaryDirectory() as tmpdir:

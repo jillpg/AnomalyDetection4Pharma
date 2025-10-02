@@ -13,6 +13,7 @@ sys.path.insert(0, str(root_dir / 'src'))
 from etl_auxiliary import process_normalization, process_process, process_laboratory
 from helpers import upload_csv_to_s3  # helper común para S3
 
+@pytest.mark.integration
 @pytest.mark.usefixtures('spark', 'setup_minio_bucket')
 def test_process_normalization_integration(tmp_path, monkeypatch, spark):
     # Configurar entorno limpio
@@ -42,10 +43,11 @@ def test_process_normalization_integration(tmp_path, monkeypatch, spark):
     assert df.count() == 1
     assert set(df.columns) >= {"code", "normalisation_factor"}
 
+@pytest.mark.integration
 @pytest.mark.usefixtures('spark', 'setup_minio_bucket')
 def test_process_process_and_laboratory_integration(tmp_path, monkeypatch, spark):
     # Configurar entorno limpio
-    monkeypatch.setenv('AWS_ACCESS_KEY_ID', 'minioadmin')
+    
     monkeypatch.setenv('AWS_SECRET_ACCESS_KEY', 'minioadmin')
     monkeypatch.setenv('AWS_REGION', 'us-east-1')
     monkeypatch.setenv('BUCKET_NAME', 'test-bucket')

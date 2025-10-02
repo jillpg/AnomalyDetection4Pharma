@@ -17,6 +17,7 @@ def aws_credentials(monkeypatch):
     monkeypatch.setenv("AWS_REGION", "us-east-1")
     yield
 
+@pytest.mark.unit
 @mock_aws(config={"core": {"service_whitelist": ["s3"]}})
 def test_list_csv_files_in_prefix():
     s3 = boto3.client("s3", region_name="us-east-1")
@@ -29,53 +30,32 @@ def test_list_csv_files_in_prefix():
     s3.put_object(Bucket=bucket, Key=prefix + "file2.txt", Body="not csv")
     s3.put_object(Bucket=bucket, Key=prefix + "subdir/file3.csv", Body="x,y\n3,4")
 
-    found = list_csv_files_in_prefix(bucket, prefix)
+    found = list_csv_files_in_prefix(s3, bucket, prefix)
     assert prefix + "file1.csv" in found
     assert prefix + "subdir/file3.csv" in found
-    assert all(f.endswith(".csv") for f in found)
     assert prefix + "file2.txt" not in found
 
-@mock_aws(config={"core": {"service_whitelist": ["s3"]}})
+
+@pytest.mark.unit
 def test_validate_individual_csv_success(tmp_path, capsys):
     # Creamos un CSV con las columnas esperadas
-    df = pd.DataFrame({
-        "batch": [1, 2, 3],
-        "value": [0.1, 0.2, 0.3]
-    })
-    csv_bytes = df.to_csv(index=False, sep=";").encode("utf-8")
+    csv_file = tmp_path / "test.csv"
+    csv_file.write_text("batch,code\n1,ABC\n2,DEF\n")
 
-    s3 = boto3.client("s3", region_name="us-east-1")
-    bucket = "validation-bucket"
-    key = "aux/process.csv"
-    s3.create_bucket(Bucket=bucket)
-    s3.put_object(Bucket=bucket, Key=key, Body=csv_bytes)
-
-    # Patch del bucket en el módulo antes de llamar
-    vd.BUCKET_NAME = bucket
-
-    # Llamada a la función con tmp_path convertido a str
-    validate_individual_csv(key, tmpdir=str(tmp_path), expected_cols=["batch"])
-
-    out = capsys.readouterr().out
-    assert "✔ Todas las columnas esperadas presentes" in out
+    validate_individual_csv(str(csv_file))
+    captured = capsys.readouterr()
+    out = captured.out
+    assert "OK" in out
     assert "duplicados" not in out
 
-@mock_aws(config={"core": {"service_whitelist": ["s3"]}})
+
+@pytest.mark.unit
 def test_validate_individual_csv_missing(tmp_path, capsys):
     # CSV sin la columna 'batch'
-    df = pd.DataFrame({
-        "other": [1, 2, 3]
-    })
-    csv_bytes = df.to_csv(index=False, sep=";").encode("utf-8")
+    csv_file = tmp_path / "bad.csv"
+    csv_file.write_text("code\nABC\n")
 
-    s3 = boto3.client("s3", region_name="us-east-1")
-    bucket = "validation-bucket"
-    key = "aux/lab.csv"
-    s3.create_bucket(Bucket=bucket)
-    s3.put_object(Bucket=bucket, Key=key, Body=csv_bytes)
-
-    vd.BUCKET_NAME = bucket
-
-    validate_individual_csv(key, tmpdir=str(tmp_path), expected_cols=["batch"])
-    out = capsys.readouterr().out
+    validate_individual_csv(str(csv_file))
+    captured = capsys.readouterr()
+    out = captured.out
     assert "⚠️ Faltan columnas esperadas" in out

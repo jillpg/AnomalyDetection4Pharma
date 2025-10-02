@@ -38,6 +38,7 @@ class MockResponseBinary:
         if self.status_code >= 400:
             raise Exception(f"HTTP Error: {self.status_code}")
 
+@pytest.mark.unit
 @mock_aws(config={"core": {"service_whitelist": ["s3"]}})
 @patch("src.data_ingest.requests.get")
 def test_ingest_upload(mock_get, monkeypatch,tmp_path):
