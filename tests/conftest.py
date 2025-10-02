@@ -4,7 +4,7 @@ import boto3
 from pyspark.sql import SparkSession
 
 # Fixture para crear y limpiar el bucket de prueba en MinIO
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def setup_minio_bucket():
     """
     Se asegura de que el bucket 'test-bucket' exista en MinIO antes de ejecutar los tests.
