@@ -52,7 +52,7 @@ jobs:
     needs: unit
     services:
       minio:
-        image: minio/minio:latest
+        image: bitnami/minio:latest
         ports:
           - 9000:9000   # API S3
           - 9001:9001   # Consola web
