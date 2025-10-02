@@ -56,8 +56,8 @@ def spark():
         SparkSession.builder
         .appName("ETLTest")
         .master("local[2]")
-        # Incluir paquete Hadoop AWS compatible
-        .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.3")
+        # Incluir paquete Hadoop AWS compatible (misma versión que Docker)
+        .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.4.1")
         # Configuración S3A para MinIO
         .config("spark.hadoop.fs.s3a.endpoint", endpoint_host)
         .config("spark.hadoop.fs.s3a.path.style.access", "true")
