@@ -1,0 +1,44 @@
+services:
+  jupyter-pyspark:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: jupyter-pyspark
+    ports:
+      - "8888:8888"
+    volumes:
+      - ..:/app
+    environment:
+      - PYSPARK_PYTHON=/usr/local/bin/python
+      - PYSPARK_DRIVER_PYTHON=/usr/local/bin/python
+      - JUPYTER_TOKEN=changeme
+    env_file:
+      - ../.env
+
+    networks:
+      - spark-network
+      - minio-net
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - minio-net
+
+volumes:
+  minio_data:
+
+
+networks:
+  minio-net:
+  spark-network:
+    driver: bridge
