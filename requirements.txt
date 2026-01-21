@@ -1,4 +1,4 @@
---extra-index-url https://download.pytorch.org/whl/cpu
+--extra-index-url https://download.pytorch.org/whl/cu126
 
 pandas
 moto
@@ -10,9 +10,15 @@ numpy
 scikit-learn
 matplotlib
 seaborn
-pyspark
-torch
+pyspark==3.5.3
+torch==2.7.1+cu126
 botocore
 requests
 jupyter
 findspark
+statsmodels
+lightgbm
+shap
+xgboost
+catboost
+pyarrow

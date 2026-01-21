@@ -1,70 +1,29 @@
-# Entornos virtuales
-venv/
-.env/
-.envrc
-.venv/
-pip-wheel-metadata/
-*.egg-info/
-.env
+*.txt
 
-# Python cache
-__pycache__/
-*.py[cod]
-*.pyo
-
-.pytest_cache
-
-# Logs y artefactos temporales
-*.log
-*.tmp
-*.bak
-
-# Archivos grandes o generados automáticamente
-data/raw/*
-!data/raw/.gitkeep
-data/processed/*
-!data/processed/.gitkeep
 *.parquet
+
 *.csv
 
-# Modelos entrenados
-*.pt
-*.h5
-*.pkl
+__pycache__
+
+*.ipynb_checkpoints
+
+*.png    
+*.jpg
+*.pdf    
+*.html
+
+
+__init__.py
+legacy_archive/
+legacy/
+artifacts/
 models/
 
-# Notebooks con output pesado
-.ipynb_checkpoints/
-notebooks/*-output.ipynb
+*.md
+!README.MD
 
-# Resultados de SHAP y visualizaciones temporales
-shap_values/
-explainability_outputs/
 
-# Docker
-docker/*.log
-docker/volumes/
-*.tar
+.env
+env.prod.template
 
-# AWS credenciales (nunca subir estos archivos)
-.aws/
-credentials.json
-*.pem
-*.key
-
-# Jupyter notebook config
-.jupyter/
-.nbconvert.ipynb
-
-# VSCode/IDE
-.vscode/
-.idea/
-
-# CI/CD
-.github/secrets.yml
-coverage.xml
-dist/
-build/
-
-# Streamlit (si se usa en producción)
-.streamlit/secrets.toml
