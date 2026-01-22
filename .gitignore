@@ -27,3 +27,4 @@ models/
 .env
 env.prod.template
 
+.vscode

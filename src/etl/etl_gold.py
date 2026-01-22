@@ -65,9 +65,9 @@ def main():
     
     # 9. Save to Gold
     print("💾 Saving Gold Parquet files...")
-    loader.save_parquet(df_train_final, f"{gold_path}/Train", partition_by="campaign")
-    loader.save_parquet(df_val_final, f"{gold_path}/Val", partition_by="campaign")
-    loader.save_parquet(df_test_final, f"{gold_path}/Test", partition_by="campaign")
+    loader.save_parquet(df_train_final.coalesce(1), f"{gold_path}/Train", partition_by="campaign")
+    loader.save_parquet(df_val_final.coalesce(1), f"{gold_path}/Val", partition_by="campaign")
+    loader.save_parquet(df_test_final.coalesce(1), f"{gold_path}/Test", partition_by="campaign")
     
     print("✨ Gold Layer ETL Finished Successfully.")
 
