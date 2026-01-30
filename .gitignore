@@ -17,14 +17,26 @@ __pycache__
 __init__.py
 legacy_archive/
 legacy/
-artifacts/
-models/
+
 
 *.md
 !README.MD
+
+archive/
+docs/
 
 
 .env
 env.prod.template
 
+data/
+
+.venv/
+venv/
 .vscode
+
+colab_export/
+colab_execute/
+
+reports/
+#results/
