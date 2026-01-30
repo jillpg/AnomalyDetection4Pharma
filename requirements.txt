@@ -4,6 +4,7 @@ pandas
 moto
 boto3
 pytest
+pytest-mock
 python-dotenv
 dotenv
 numpy
