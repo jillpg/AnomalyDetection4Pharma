@@ -1,0 +1,24 @@
+{
+    "threshold_recon": 0.03635052219033241,
+    "threshold_maha": 16.26623619623813,
+    "tests": [
+        {
+            "type": "drift_end",
+            "Detection_Rate": 99.14285714285714,
+            "Avg_SNR": 0.9999999139611128,
+            "Avg_Anomaly_MAE": 0.023202511672196644
+        },
+        {
+            "type": "freeze",
+            "Detection_Rate": 100.0,
+            "Avg_SNR": 1.0010449500724947,
+            "Avg_Anomaly_MAE": 0.020172032327391207
+        },
+        {
+            "type": "spike",
+            "Detection_Rate": 99.57142857142857,
+            "Avg_SNR": 7.824813324958599,
+            "Avg_Anomaly_MAE": 0.08974988965517176
+        }
+    ]
+}
