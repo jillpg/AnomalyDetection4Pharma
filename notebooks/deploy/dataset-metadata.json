@@ -1,0 +1,30 @@
+{
+    "title": "AnomalyDetection4Pharma - Gold Tensor",
+    "id": "jillpalmagarro/anomalydetection4pharma-gold-tensor",
+    "licenses": [
+        {
+            "name": "CC0-1.0"
+        }
+    ],
+    "keywords": [
+        "manufacturing",
+        "anomaly detection",
+        "lstm",
+        "autoencoder",
+        "time series"
+    ],
+    "resources": [
+        {
+            "path": "train.parquet",
+            "description": "Training data (MinMax scaled, chronological split)"
+        },
+        {
+            "path": "val.parquet",
+            "description": "Validation data (MinMax scaled, chronological split)"
+        },
+        {
+            "path": "test.parquet",
+            "description": "Test data (MinMax scaled, chronological split)"
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "id": "jillpalmagarro/baseline-models-phase-4-5",
+    "title": "Baseline Models Phase 4 5",
+    "code_file": "../02_Baseline_Models.ipynb",
+    "language": "python",
+    "kernel_type": "notebook",
+    "is_private": true,
+    "enable_gpu": false,
+    "enable_internet": false,
+    "dataset_sources": [
+        "jillpalmagarro/anomalydetection4pharma-gold-tensor"
+    ],
+    "competition_sources": [],
+    "kernel_sources": [],
+    "model_sources": []
+}

@@ -1,0 +1,17 @@
+{
+    "id": "jillpalmagarro/lstm-stress-testing-evaluation-phase-6",
+    "title": "LSTM Stress Testing & Evaluation (Phase 6)",
+    "code_file": "../04_Stress_Testing.ipynb",
+    "language": "python",
+    "kernel_type": "notebook",
+    "is_private": true,
+    "enable_gpu": true,
+    "enable_internet": false,
+    "dataset_sources": [
+        "jillpalmagarro/anomalydetection4pharma-gold-tensor",
+        "jillpalmagarro/ad4p-training-results"
+    ],
+    "competition_sources": [],
+    "kernel_sources": [],
+    "model_sources": []
+}
