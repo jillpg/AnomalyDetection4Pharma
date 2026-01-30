@@ -4,6 +4,9 @@ __pycache__/
 *$py.class
 *.ipynb_checkpoints
 
+__init__.py
+__init__.pyc
+
 # Virtual Env
 .venv/
 venv/
@@ -35,3 +38,6 @@ logs/
 # Allow models and results (User preference)
 # models/
 # results/
+
+docs/
+reports/
