@@ -4,7 +4,6 @@ import io
 import os
 import sys
 
-# Add src to pythonpath
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.config import get_boto3_client
 
@@ -37,6 +36,23 @@ def ingest_data():
     s3 = get_boto3_client()
     bucket = os.getenv("BUCKET_BRONZE", "bronze")
     
+    try:
+        s3.head_bucket(Bucket=bucket)
+    except:
+        # AWS Handling: Fail fast if bucket missing (BYOB)
+        if not os.getenv("S3_ENDPOINT_URL"):
+            print(f"❌ Critical Error: Bucket '{bucket}' does not exist.")
+            print("   ☁️  AWS Mode Detected: You must create buckets manually.")
+            sys.exit(1)
+
+        # MinIO Handling: Auto-create
+        try:
+            s3.create_bucket(Bucket=bucket)
+            print(f"✅ Created bucket: {bucket}")
+        except Exception as e:
+            print(f"⚠️ Could not create bucket {bucket}: {e}")
+            return
+
     total_files = 0
     allowed_extensions = ('.csv', '.zip')
     
@@ -66,9 +82,14 @@ def ingest_data():
                         for filename in z.namelist():
                             if filename.endswith('/'): continue # Skip directories
                             
-                            print(f"      📦 Extracting & Uploading: {filename}...")
+                            # RENAME: Process/ -> process_time_series/
+                            target_key = filename
+                            if filename.startswith("Process/"):
+                                target_key = filename.replace("Process/", "process_time_series/")
+                            
+                            print(f"      📦 Extracting & Uploading: {filename} -> {target_key}")
                             with z.open(filename) as f:
-                                s3.upload_fileobj(f, bucket, filename)
+                                s3.upload_fileobj(f, bucket, target_key)
                                 total_files += 1
                 else:
                     # Handle CSV: Stream Upload
