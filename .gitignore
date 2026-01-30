@@ -1,42 +1,37 @@
-*.txt
-
-*.parquet
-
-*.csv
-
-__pycache__
-
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
 *.ipynb_checkpoints
 
-*.png    
-*.jpg
-*.pdf    
-*.html
-
-
-__init__.py
-legacy_archive/
-legacy/
-
-
-*.md
-!README.MD
-
-archive/
-docs/
-
-
-.env
-env.prod.template
-
-data/
-
+# Virtual Env
 .venv/
 venv/
-.vscode
+env/
 
-colab_export/
-colab_execute/
+# Environment Variables
+.env
+.env.*
+!.env.aws_template
+!.env.example
 
-reports/
-#results/
+# IDE
+.vscode/
+.idea/
+
+# Data (Large Files)
+*.parquet
+*.zip
+data/
+bronze/
+silver/
+gold/
+
+# Logs
+logs/
+
+# Exclude sensitive keys/secrets if any (though .env covers mostly)
+
+# Allow models and results (User preference)
+# models/
+# results/
