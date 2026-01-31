@@ -22,4 +22,5 @@ lightgbm
 shap
 xgboost
 catboost
-pyarrowflake8
+pyarrow
+flake8
