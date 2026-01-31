@@ -12,6 +12,8 @@ __init__.pyc
 venv/
 env/
 
+.pytest_cache/
+
 # Environment Variables
 .env
 .env.*
