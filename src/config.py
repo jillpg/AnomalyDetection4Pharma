@@ -76,9 +76,30 @@ def get_boto3_client():
             endpoint = f"http://{endpoint}"
         print(f"🔌 S3 Client connecting to: {endpoint}")
         return boto3.client("s3", endpoint_url=endpoint)
-    else:
         print("☁️ S3 Client connecting to AWS S3")
         return boto3.client("s3")
+
+def get_pandas_storage_options():
+    """
+    Returns storage_options dictionary for reading/writing Parquet with Pandas/s3fs.
+    Handles Cloud Agnostic logic (MinIO vs AWS).
+    """
+    s3_endpoint = os.getenv("S3_ENDPOINT_URL")
+    
+    storage_options = {
+        "client_kwargs": {
+            "aws_access_key_id": os.getenv("AWS_ACCESS_KEY_ID"),
+            "aws_secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
+            "region_name": os.getenv("AWS_REGION", "us-east-1")
+        }
+    }
+    
+    if s3_endpoint:
+        if "://" not in s3_endpoint:
+            s3_endpoint = f"http://{s3_endpoint}"
+        storage_options["client_kwargs"]["endpoint_url"] = s3_endpoint
+    
+    return storage_options
 
 # Core sensor features
 CORE_SENSORS = ["main_comp", "pre_comp", "tbl_speed", "tbl_fill", "ejection"]
