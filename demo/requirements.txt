@@ -1,0 +1,10 @@
+streamlit>=1.30.0
+torch>=2.0.0
+scikit-learn>=1.3.0
+pandas>=2.0.0
+numpy>=1.24.0
+plotly>=5.17.0
+datasets>=2.16.0
+huggingface_hub
+joblib
+python-dotenv
