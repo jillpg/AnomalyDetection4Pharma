@@ -1,7 +1,6 @@
 
 import sys
 import os
-import io
 
 # Load environment variables from .env
 from dotenv import load_dotenv

@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
 
+
 def main():
     spark = SparkSession.builder \
         .appName("CSV Test") \
@@ -21,6 +22,7 @@ def main():
     print(f"Parquet saved to {parquet_path}")
 
     spark.stop()
+
 
 if __name__ == "__main__":
     main()

@@ -4,6 +4,7 @@ import sys
 sys.path.append(os.path.abspath('src'))
 from config import get_boto3_client
 
+
 def upload_csv_to_s3(local_csv_path, s3_key, bucket="test-bronze"):
     """
     Uploads local CSV to MinIO test bucket.
