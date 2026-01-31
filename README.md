@@ -46,7 +46,7 @@ graph LR
 ### Prerequisites
 
 - Docker & Docker Compose
-- Python 3.12+
+- Python 3.12+ (requirements: `python-dotenv`, `boto3`, `pyspark`)
 - NVIDIA GPU (optional, for CUDA acceleration)
 - Kaggle API credentials (for deployment)
 
@@ -198,16 +198,37 @@ bash scripts/ops/promote_model.sh
 ## 🔧 Configuration
 
 ### Environment Variables (`.env`)
+
+The project supports **Cloud Agnostic** execution (Local/MinIO vs AWS S3).
+
+**Option 1: Local Development (MinIO)**
 ```bash
-# MinIO/S3 Configuration
+# S3_ENDPOINT_URL defines the MinIO address.
+# If this variable is set, the system assumes "MinIO Mode".
 S3_ENDPOINT_URL=http://localhost:9000
+
 BUCKET_BRONZE=bronze
 BUCKET_SILVER=silver
 BUCKET_GOLD=gold
-
-# AWS Credentials (for MinIO)
 AWS_ACCESS_KEY_ID=minioadmin
 AWS_SECRET_ACCESS_KEY=minioadmin
+```
+
+**Option 2: AWS Production**
+Renombrar `.env.aws_template` a `.env` y configurar:
+```bash
+# COMMENT OUT this line to enable "AWS Mode" (native S3)
+# S3_ENDPOINT_URL=...
+
+# Use real AWS Credentials
+AWS_ACCESS_KEY_ID=AKIA...
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION=us-east-1
+
+# Use real unique bucket names (created manually in console)
+BUCKET_BRONZE=my-company-bronze-prod
+BUCKET_SILVER=my-company-silver-prod
+BUCKET_GOLD=my-company-gold-prod
 ```
 
 ### Kaggle Credentials
