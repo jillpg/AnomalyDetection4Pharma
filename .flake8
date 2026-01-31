@@ -1,0 +1,9 @@
+[flake8]
+max-line-length = 120
+exclude = .git,__pycache__,docs/source/conf.py,old,build,dist,.venv,env,notebooks
+ignore = E203, E266, E501, W503, E402
+# E203: Whitespace before ':'
+# E266: Too many leading '#' for block comment
+# E501: Line too long (handled by max-line-length)
+# W503: Line break before binary operator
+# E402: Module level import not at top of file (common in scripts/notebooks)
