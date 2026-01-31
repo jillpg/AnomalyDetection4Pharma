@@ -17,6 +17,23 @@ A production-ready MLOps system for real-time anomaly detection in pharmaceutica
 - ⚡ **Distributed Processing**: PySpark + MinIO for scalability
 - 🐳 **Docker-Based**: GPU/CPU support, reproducible environments
 - 📊 **MLOps Ready**: Kaggle deployment, model versioning, automated pipelines
+- 🔄 **CI/CD Integrated**: Automated testing and linting via GitHub Actions
+
+## 🔄 CI/CD Framework
+
+[![Main Build](https://github.com/jillpg/AnomalyDetection4Pharma/actions/workflows/main_build.yaml/badge.svg)](https://github.com/jillpg/AnomalyDetection4Pharma/actions/workflows/main_build.yaml)
+[![PR Check](https://github.com/jillpg/AnomalyDetection4Pharma/actions/workflows/pr_check.yaml/badge.svg)](https://github.com/jillpg/AnomalyDetection4Pharma/actions/workflows/pr_check.yaml)
+
+This project uses a robust CI/CD pipeline ensuring code quality and stability:
+
+1.  **PR Check (`pr_check.yaml`)**:
+    - Triggers on Pull Requests to `main`.
+    - 🧹 Lints code with `flake8`.
+    - 🧪 Runs unit tests with `pytest`.
+
+2.  **Main Build (`main_build.yaml`)**:
+    - Triggers on pushes to `main`.
+    - Ensures production readiness.
 
 ## 🏗️ Architecture
 
