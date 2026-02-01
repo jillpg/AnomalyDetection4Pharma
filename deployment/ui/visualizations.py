@@ -2,90 +2,101 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 
+# Neon Industrial Theme Constants
+COLOR_CYAN = '#00F0FF'       # Normal State
+COLOR_RED = '#FF3838'        # Alert State (Neon Crimson)
+COLOR_AMBER = '#FFB300'      # Warning State
+COLOR_GRID = '#2D3748'       # Subtle Blue-Grey
+FONT_FAMILY = "JetBrains Mono, monospace"
+
 def create_sensor_plot(history_dict, sensor_name, anomaly_region=None):
     """
-    Creates Plotly line chart for a single sensor.
-    Args:
-        history_dict: dict {sensor: [values]}
-        sensor_name: e.g., "dynamic_tensile_strength"
-        anomaly_region: tuple (start_idx, end_idx) for red shading (Not implemented for MVP)
+    Creates Plotly line chart with 'Laser Glow' effect.
     """
     values = history_dict.get(sensor_name, [])
-    # Determine X axis (relative time)
     x_axis = list(range(len(values)))
     
     fig = go.Figure()
+    
+    # 1. The Glow Trace (Wide, Transparent)
     fig.add_trace(go.Scatter(
-        x=x_axis, 
-        y=values, 
-        mode='lines', 
+        x=x_axis, y=values, mode='lines', 
+        name=sensor_name + '_glow',
+        line=dict(color=COLOR_CYAN, width=6),
+        opacity=0.2,
+        hoverinfo='skip'
+    ))
+    
+    # 2. The Core Laser Trace (Thin, Bright)
+    fig.add_trace(go.Scatter(
+        x=x_axis, y=values, mode='lines', 
         name=sensor_name,
-        line=dict(color='#00d9ff', width=2)
+        line=dict(color=COLOR_CYAN, width=2)
     ))
     
     fig.update_layout(
-        title=dict(text=sensor_name.replace("_", " ").title(), font=dict(size=14)),
-        margin=dict(l=20, r=20, t=30, b=20),
-        height=200,
+        title=dict(text=sensor_name.replace("_", " ").upper(), font=dict(size=12, color='#A0AEC0')),
+        margin=dict(l=10, r=10, t=30, b=10),
+        height=180,
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         xaxis=dict(showgrid=False, visible=False),
-        yaxis=dict(showgrid=True, gridcolor='#333'),
-        font=dict(color='#e0e6ff'),
-        uirevision='static', # Prevent reset on update
+        yaxis=dict(showgrid=True, gridcolor=COLOR_GRID, zeroline=False),
+        font=dict(color='#E2E8F0', family=FONT_FAMILY),
+        uirevision='static', 
+        showlegend=False
     )
     
     return fig
 
 def create_error_chart(error_history, threshold):
     """
-    Line chart showing MSE over time with persistent red threshold line.
+    MSE chart with Neon Red threshold and filled area.
     """
     fig = go.Figure()
     
+    # Area Glow
     fig.add_trace(go.Scatter(
         y=error_history, 
         mode='lines', 
-        name='Reconstruction Error',
-        line=dict(color='#00ff88', width=2),
+        name='MSE',
+        line=dict(color='#10B981', width=2), # Emerald Green for base error
         fill='tozeroy',
-        fillcolor='rgba(0, 255, 136, 0.1)'
+        fillcolor='rgba(16, 185, 129, 0.1)'
     ))
     
-    # Threshold line
+    # Threshold Line (Neon Red)
     fig.add_hline(
         y=threshold, 
-        line_dash="dash", 
-        line_color="#ff4444", 
-        annotation_text="99.9% Threshold",
-        annotation_font=dict(color="#ff4444"),
-        annotation_position="bottom right"
+        line_dash="dot", 
+        line_width=3,
+        line_color=COLOR_RED,
+        annotation_text="THRESHOLD (99.9%)",
+        annotation_font=dict(color=COLOR_RED, family=FONT_FAMILY),
+        annotation_position="top right"
     )
     
     fig.update_layout(
-        title="Anomaly Score (MSE)",
-        margin=dict(l=20, r=20, t=40, b=20),
-        height=250,
+        title="RECONSTRUCTION ERROR (MSE)",
+        margin=dict(l=20, r=20, t=30, b=20),
+        height=220,
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
-        xaxis=dict(showgrid=False, title="Time"),
-        yaxis=dict(showgrid=True, gridcolor='#333'),
-        font=dict(color='#e0e6ff'),
-        uirevision='static', # Prevent reset on update
+        xaxis=dict(showgrid=False, title="TIME WINDOW"),
+        yaxis=dict(showgrid=True, gridcolor=COLOR_GRID),
+        font=dict(color='#E2E8F0', family=FONT_FAMILY),
+        uirevision='static',
+        showlegend=False
     )
     
     return fig
 
 def create_attribution_chart(attribution_vector, sensor_names):
     """
-    Horizontal bar chart showing per-sensor reconstruction error.
-    Args:
-        attribution_vector: np.array of error values
-        sensor_names: list of sensor strings
+    Root Cause Analysis (RCA) - Horizontal Bars
     """
-    # Create DF for sorting
     df = pd.DataFrame({
-        'sensor': sensor_names,
+        'sensor': [s.replace("_", " ").upper() for s in sensor_names],
         'error': attribution_vector
     }).sort_values('error', ascending=True)
     
@@ -93,19 +104,23 @@ def create_attribution_chart(attribution_vector, sensor_names):
         x=df['error'],
         y=df['sensor'],
         orientation='h',
-        marker=dict(color='#ff4444', line=dict(width=1, color='#ffebea')) # Red bars with white border
+        marker=dict(
+            color=df['error'],
+            colorscale=[[0, COLOR_CYAN], [1, COLOR_RED]], # Gradient from Cyan to Red based on severity
+            line=dict(width=0)
+        )
     ))
     
     fig.update_layout(
-        title="Root Cause Analysis (Contribution)",
-        margin=dict(l=20, r=20, t=40, b=20),
-        height=250,
+        title="ROOT CAUSE ANALYSIS",
+        margin=dict(l=20, r=20, t=30, b=20),
+        height=220,
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
-        xaxis=dict(showgrid=True, gridcolor='#333', title="Reconstruction Error"),
-        yaxis=dict(showgrid=False, tickfont=dict(color='#e0e6ff')),
-        font=dict(color='#e0e6ff'),
-        uirevision='static', # Stabilize updates
+        xaxis=dict(showgrid=True, gridcolor=COLOR_GRID, title="CONTRIBUTION"),
+        yaxis=dict(showgrid=False, tickfont=dict(color='#A0AEC0', size=10)),
+        font=dict(color='#E2E8F0', family=FONT_FAMILY),
+        uirevision='static',
     )
     
     return fig

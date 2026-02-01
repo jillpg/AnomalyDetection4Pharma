@@ -163,7 +163,11 @@ with st.sidebar:
         st.warning(f"Anomaly Active: {st.session_state.anomaly['type']}")
 
 # --- 5. Main Layout ---
-st.title("PharmaGuard Control Center")
+st.markdown("""
+<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+    <h1 style="margin: 0; color: #f9fafb;">💊 PharmaGuard <span style="color: #3b82f6; font-size: 0.6em; vertical-align: middle;">AI CORE</span></h1>
+</div>
+""", unsafe_allow_html=True)
 
 # --- 6. The FRAGMENT (Auto-refreshing dashboard) ---
 @st.fragment(run_every=0.5) # Updates every 500ms for balance
@@ -206,8 +210,9 @@ def run_dashboard():
         health = max(0, 100 - (result['lstm_error'] * 1000))
         render_kpi_row(status, result['lstm_error'], health)
         
+        st.markdown("### 📡 Sensor Telemetry")
         # Charts Container
-        with st.container():
+        with st.container(border=True):
             # Row 1: Sensors
             row1 = st.columns(3)
             sensors = stream.feature_cols[:3]
@@ -230,10 +235,9 @@ def run_dashboard():
                             key=f"chart_{sensor}"
                         )
                 
-            st.divider()
-            
-            # Row 3: Analysis
-            st.markdown("### 🔍 Real-Time Analysis")
+        # Row 3: Analysis
+        st.markdown("### 🔍 Real-Time Analysis")
+        with st.container(border=True):
             col_err, col_consensus = st.columns([2, 1])
             
             with col_err:
