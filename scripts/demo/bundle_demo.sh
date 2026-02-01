@@ -1,37 +1,52 @@
 #!/bin/bash
 # scripts/demo/bundle_demo.sh
 
-echo "📦 Bundling PharmaGuard Demo for Deployment..."
+# CONFIGURATION
+# Target directory OUTSIDE the main project text
+# This acts as the separate Hugging Face Git Repository
+DEPLOY_DIR="../AnomalyDetection4Pharma_HF"
 
-# 1. Create Deployment Directory
-rm -rf deployment
-mkdir -p deployment
-mkdir -p deployment/models
-mkdir -p deployment/ui
-mkdir -p deployment/simulation
-mkdir -p deployment/assets
+echo "📦 Bundling PharmaGuard Demo..."
+echo "   Target Directory: $DEPLOY_DIR"
+
+# 1. Prepare Directory (Safe Cleanup)
+if [ ! -d "$DEPLOY_DIR" ]; then
+    echo "   Creating new target directory..."
+    mkdir -p "$DEPLOY_DIR"
+else
+    echo "   Cleaning existing files (PRESERVING .git)..."
+    # Find and delete everything inside DEPLOY_DIR except .git and the dir itself
+    find "$DEPLOY_DIR" -mindepth 1 -maxdepth 1 -not -name '.git' -exec rm -rf {} +
+fi
+
+# Ensure subdirectories
+mkdir -p "$DEPLOY_DIR/models"
+mkdir -p "$DEPLOY_DIR/ui"
+mkdir -p "$DEPLOY_DIR/simulation"
+mkdir -p "$DEPLOY_DIR/assets"
 
 # 2. Copy Code
-echo "   Copying source code..."
-cp -r demo/* deployment/
+echo "   Copying source code from demo/..."
+cp -r demo/* "$DEPLOY_DIR/"
 
-# 3. Copy Models
-# SKIPPED: Models are downloaded at runtime from HF Hub (JPEGE/pharma-models)
-# We only create the directory structure
+# 3. Models
 echo "   Skipping model copy (using HF Hub download)..."
-mkdir -p deployment/models
 
-# 4. Final Cleanup
-# We don't need __pycache__
-find deployment -name "__pycache__" -type d -exec rm -rf {} +
+# 4. Cleanup
+find "$DEPLOY_DIR" -name "__pycache__" -type d -exec rm -rf {} +
 
-echo "✅ Bundle created in 'deployment/' folder."
-echo "   Total size:"
-du -sh deployment/
-
+echo "✅ Bundle created in: $DEPLOY_DIR"
 echo ""
-echo "🚀 Deployment Instructions:"
-echo "1. Create a new Space on Hugging Face (SDK: Docker)."
-echo "2. Upload the contents of the 'deployment/' folder to the root of the Space."
-echo "   (You can use 'git push' or the Web UI 'Upload Files')."
-echo "3. Run 'python scripts/demo/upload_demo_data.py' to ensure data is on HF Hub."
+echo "🚀 NEW Deployment Instructions (External Folder):"
+echo "1. Go to the deployment folder:"
+echo "   cd $DEPLOY_DIR"
+echo ""
+echo "2. Initialize Git (if first time):"
+echo "   git init"
+echo "   git remote add space https://huggingface.co/spaces/jillpg/PharmaGuard"
+echo "   git pull space main"
+echo ""
+echo "3. Deploy:"
+echo "   git add ."
+echo "   git commit -m 'Update from PharmaGuard Core'"
+echo "   git push space main"
