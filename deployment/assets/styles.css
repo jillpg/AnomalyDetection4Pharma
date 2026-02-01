@@ -66,10 +66,6 @@ div[data-testid="stMetricLabel"] {
 section[data-testid="stSidebar"] {
     background-color: #0b0d10;
     border-right: 1px solid #1f2937;
-    width: 320px !important;
-    /* Fixed width */
-    min-width: 320px !important;
-    max-width: 320px !important;
 }
 
 /* Hide Resize Handle */
@@ -96,6 +92,8 @@ div.stButton>button {
     letter-spacing: 0.5px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-transform: uppercase;
+    white-space: nowrap;
+    /* Prevent wrapping */
 }
 
 div.stButton>button:hover {
@@ -183,6 +181,10 @@ div.stButton>button:active {
     font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 
 .status-ok {

@@ -111,45 +111,65 @@ if 'history' not in st.session_state:
     st.session_state.history = {col: [] for col in stream.feature_cols}
     st.session_state.errors = []
     st.session_state.playing = False
+    st.session_state.system_active = False # Controls visibility (Stop vs Pause)
     st.session_state.anomaly = None # {type, sensor, start_step}
-    
-# --- 4. Sidebar Controls ---
-with st.sidebar:
+    st.session_state.last_result = None # Persistence for Pause state
+
+# --- 4. Sidebar Controls (Fragmented) ---
+@st.fragment
+def render_sidebar_controls():
     st.header("⚙️ Simulation Controls")
     
-    col_play, col_reset = st.columns(2)
-    with col_play:
-        if st.button("⏸️ Pause" if st.session_state.playing else "▶️ Play"):
-            st.session_state.playing = not st.session_state.playing
-            # No rerun needed here, fragment will pick it up or we force a rerender of controls
-            
-    with col_reset:
-        if st.button("🔄 Reset"):
+    # Row 1: Play/Pause (Important action, full width or larger)
+    label = "⏸️ PAUSE" if st.session_state.playing else "▶️ PLAY"
+    if st.button(label, use_container_width=True):
+        st.session_state.playing = not st.session_state.playing
+        if st.session_state.playing:
+            st.session_state.system_active = True 
+        st.rerun()
+
+    # Row 2: Stop | Reset (Secondary actions)
+    col_stop, col_reset = st.columns(2)
+    with col_stop:
+        if st.button("⏹️ STOP", use_container_width=True):
+            st.session_state.playing = False
+            st.session_state.system_active = False
+            st.session_state.last_result = None
             stream.reset()
             st.session_state.history = {col: [] for col in stream.feature_cols}
             st.session_state.errors = []
             st.session_state.anomaly = None
-            st.rerun() # Force full reset
+            st.rerun()
+
+    with col_reset:
+        if st.button("🔄 RESET", use_container_width=True):
+            stream.reset()
+            st.session_state.history = {col: [] for col in stream.feature_cols}
+            st.session_state.errors = []
+            st.session_state.anomaly = None
+            st.session_state.last_result = None
+            st.session_state.system_active = True 
+            st.rerun()
             
     st.divider()
     st.header("💉 Inject Anomaly")
     
-    # Buttons to trigger anomalies
-    if st.button("⚡ Spike (Tensile)"):
+    # Buttons to trigger anomalies - All full width
+    if st.button("⚡ SPIKE (TENSILE)", use_container_width=True):
         st.session_state.anomaly = {
             'type': 'spike',
             'sensor': 0, # dynamic_tensile_strength
             'start': stream.current_idx
         }
     
-    if st.button("📈 Drift (Ejection)"):
+    if st.button("📈 DRIFT (EJECTION)", use_container_width=True):
          st.session_state.anomaly = {
             'type': 'drift',
             'sensor': 1, # ejection
             'start': stream.current_idx
         }
         
-    if st.button("❄️ Freeze (Speed)"):
+    if st.button("❄️ FREEZE (SPEED)", use_container_width=True):
          st.session_state.anomaly = {
             'type': 'freeze',
             'sensor': 2, # tbl_speed
@@ -162,6 +182,9 @@ with st.sidebar:
     if st.session_state.anomaly:
         st.warning(f"Anomaly Active: {st.session_state.anomaly['type']}")
 
+with st.sidebar:
+    render_sidebar_controls()
+
 # --- 5. Main Layout ---
 st.markdown("""
 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
@@ -172,7 +195,9 @@ st.markdown("""
 # --- 6. The FRAGMENT (Auto-refreshing dashboard) ---
 @st.fragment(run_every=0.5) # Updates every 500ms for balance
 def run_dashboard():
-    # Only update simulation if playing
+    
+    # LOGIC UPDATE: We only UPDATE data if playing, but we RENDER if system_active
+    
     if st.session_state.playing:
         # 1. Injection Logic
         def inject_logic(values):
@@ -180,7 +205,7 @@ def run_dashboard():
                 return injector.apply(values, st.session_state.anomaly, stream.current_idx)
             return values
         
-        # 2. Get Data
+        # 2. Get Data (Advance Time)
         sample = stream.next_sample(injection_callback=inject_logic)
         
         # 3. Update History
@@ -192,6 +217,7 @@ def run_dashboard():
         # 4. Inference
         window = stream.get_window()
         result = detector.predict(window)
+        st.session_state.last_result = result # Persist specific inference result
         
         st.session_state.errors.append(result['lstm_error'])
         if len(st.session_state.errors) > 100:
@@ -202,13 +228,25 @@ def run_dashboard():
             elapsed = stream.current_idx - st.session_state.anomaly['start']
             if elapsed > 40:
                 st.session_state.anomaly = None
+    
+    # --- RENDER LOGIC ---
+    if st.session_state.system_active:
+        # Use persisted result if available (covers Pause state)
+        current_result = st.session_state.last_result
         
-        # --- RENDER ---
+        if current_result:
+            # LIVE or PAUSED state (Persisted)
+            status = "ANOMALY" if current_result['lstm_alert'] else "HEALTHY"
+            last_error = current_result['lstm_error']
+        else:
+            # RESET/EMPTY state
+            last_error = 0.0
+            status = "READY"
+            
+        health = max(0, 100 - (last_error * 1000))
+        render_kpi_row(status, last_error, health)
         
-        # KPI Row
-        status = "ANOMALY" if result['lstm_alert'] else "HEALTHY"
-        health = max(0, 100 - (result['lstm_error'] * 1000))
-        render_kpi_row(status, result['lstm_error'], health)
+        # ... (rest of render code)
         
         st.markdown("### 📡 Sensor Telemetry")
         # Charts Container
@@ -248,18 +286,35 @@ def run_dashboard():
                 )
                 
             with col_consensus:
-                render_model_consensus(result['lstm_alert'], result['pca_alert'], result['iso_alert'])
-                if 'attribution' in result:
-                     st.plotly_chart(
-                         create_attribution_chart(result['attribution'], stream.feature_cols), 
-                         width="stretch",
-                         key="chart_attrib"
-                     )
+                # Need alerts for consensus. If playing, use current_result.
+                # If paused, we need to persist state or just show Safe?
+                # For simplicity, if not playing, show all 'ok' or last state?
+                # We didn't save alert history. Let's assume OK when paused for now or improve later.
+                if current_result:
+                     render_model_consensus(current_result['lstm_alert'], current_result['pca_alert'], current_result['iso_alert'])
+                     if 'attribution' in current_result:
+                         st.plotly_chart(
+                             create_attribution_chart(current_result['attribution'], stream.feature_cols), 
+                             width="stretch",
+                             key="chart_attrib"
+                         )
+                else:
+                     # Paused/Reset State
+                     render_model_consensus(False, False, False)
+                     if st.session_state.errors: # If we have data but paused, try to show something? 
+                         pass 
 
     else:
-        # Paused State (Static Render)
-        render_kpi_row("PAUSED", 0.0, 100.0)
-        st.info("⏸️ Simulation Paused. Press Play in sidebar to start.")
+        # STOP STATE (System Active = False)
+        # Show specific "System Offline" UI
+        st.info("🛑 SYSTEM OFFLINE. Press play to initialize PharmaGuard Core.")
+        # Or a nice logo placeholder
+        st.markdown("""
+        <div style="text-align: center; padding: 50px; opacity: 0.5;">
+            <h1>SYSTEM OFFLINE</h1>
+            <p>Waiting for initialization...</p>
+        </div>
+        """, unsafe_allow_html=True)
 
 # Run the fragment
 run_dashboard()
