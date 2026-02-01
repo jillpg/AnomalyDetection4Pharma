@@ -1,0 +1,206 @@
+/* Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+    /* Neon Industrial Palette */
+    --bg-app: #0E1117;
+    /* Deep Carbon */
+    --card-bg: #1A1C24;
+    /* Slate Gray */
+    --border-color: #2D3748;
+    /* Subtle Metal */
+
+    --neon-cyan: #00F0FF;
+    /* Normal State */
+    --neon-red: #FF3838;
+    /* Danger/Anomaly */
+    --neon-amber: #FFB300;
+    /* Warning */
+
+    --text-primary: #E2E8F0;
+    --text-secondary: #A0AEC0;
+}
+
+/* Global Font Settings */
+html,
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+}
+
+/* Force Dark Backgrounds */
+.stApp {
+    background-color: var(--bg-app);
+}
+
+/* Metric Values (Digital Readout) */
+div[data-testid="stMetricValue"] {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--neon-cyan) !important;
+    font-size: 2rem !important;
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+    /* Cyan Glow */
+}
+
+div[data-testid="stMetricLabel"] {
+    color: var(--text-secondary) !important;
+    font-size: 0.8rem !important;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Glassmorphism Industrial Cards */
+.metric-card {
+    background-color: var(--card-bg);
+    border: 1px solid rgba(0, 240, 255, 0.1);
+    /* Subtle Cyan Border */
+    padding: 1.5rem;
+    border-radius: 4px;
+    /* Industrial corners (less round) */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+}
+
+/* Sidebar Polish */
+/* Sidebar Polish */
+section[data-testid="stSidebar"] {
+    background-color: #0b0d10;
+    border-right: 1px solid #1f2937;
+}
+
+/* Hide Resize Handle */
+div[data-testid="stSidebarResizeHandle"] {
+    display: none;
+}
+
+section[data-testid="stSidebar"] hr {
+    border-color: #333;
+}
+
+/* Industrial Buttons (Switches) */
+div.stButton>button {
+    width: 100%;
+    background-color: #171923;
+    color: var(--neon-cyan);
+    border: 1px solid #2D3748;
+    border-left: 4px solid #2D3748;
+    /* Physical Switch Indicator */
+    border-radius: 2px;
+    padding: 0.6rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    white-space: nowrap;
+    /* Prevent wrapping */
+}
+
+div.stButton>button:hover {
+    background-color: #1A202C;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+    color: #fff;
+    transform: translateX(2px);
+    /* Mechanical movement */
+}
+
+div.stButton>button:active {
+    background-color: var(--neon-cyan);
+    color: #000;
+    box-shadow: 0 0 15px var(--neon-cyan);
+}
+
+/* Indicators */
+.led-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card-bg);
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.led {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 0, 0, 0.5);
+    /* Metallic rim */
+}
+
+.led-green {
+    background-color: #10B981;
+    box-shadow: 0 0 5px #10B981, inset 0 0 3px #fff;
+}
+
+.led-red {
+    background-color: var(--neon-red);
+    box-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red), inset 0 0 4px #fff;
+    animation: alarmPulse 0.8s infinite alternate;
+}
+
+.led-amber {
+    background-color: var(--neon-amber);
+    box-shadow: 0 0 8px var(--neon-amber);
+}
+
+.led-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.led-sub {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+/* Animations */
+@keyframes alarmPulse {
+    from {
+        opacity: 0.8;
+        box-shadow: 0 0 5px var(--neon-red);
+    }
+
+    to {
+        opacity: 1;
+        box-shadow: 0 0 20px var(--neon-red);
+    }
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.status-ok {
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--neon-cyan);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+.status-alert {
+    background: rgba(255, 56, 56, 0.15);
+    color: var(--neon-red);
+    border: 1px solid var(--neon-red);
+    box-shadow: 0 0 15px rgba(255, 56, 56, 0.2);
+}
+
+/* Clean Modebar */
+.js-plotly-plot .plotly .modebar {
+    display: none;
+}
