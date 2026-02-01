@@ -1,0 +1,57 @@
+:root {
+    --bg-primary: #0a0e27;
+    --bg-secondary: #1a1e3a;
+    --text-primary: #e0e6ff;
+    --accent-blue: #00d9ff;
+    --alert-red: #ff4444;
+    --ok-green: #00ff88;
+}
+
+.stApp {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Custom Badges */
+.alert-badge {
+    background-color: var(--alert-red);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 0 10px var(--alert-red);
+    animation: pulse 1s infinite;
+}
+
+.ok-badge {
+    background-color: var(--ok-green);
+    color: #000;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 0 10px var(--ok-green);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Metric Containers */
+div[data-testid="stMetricValue"] {
+    font-size: 2rem;
+    color: var(--accent-blue);
+}
+
+div[data-testid="stMetricLabel"] {
+    color: #8b9bb4;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background-color: var(--bg-secondary);
+    border-right: 1px solid #333;
+}
