@@ -2,10 +2,19 @@
 
 **Advanced Anomaly Detection System for Pharmaceutical Tablet Manufacturing**
 
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-PharmaGuard%20AI-blue)](https://huggingface.co/spaces/jillpg/PharmaGuard)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![PySpark 3.5.3](https://img.shields.io/badge/pyspark-3.5.3-orange.svg)](https://spark.apache.org/)
 [![PyTorch 2.7.1](https://img.shields.io/badge/pytorch-2.7.1-red.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## 🎮 Interactive Demo
+
+**Try the Live System:** [PharmaGuard AI Core](https://huggingface.co/spaces/jillpg/PharmaGuard)
+
+Experience the full "Neon Industrial" operator interface, running real-time simulations and anomaly injection scenarios directly in your browser.
+
+[![PharmaGuard Dashboard](demo/images/demo_preview.png)](https://huggingface.co/spaces/jillpg/PharmaGuard)
 
 ## 📋 Overview
 
@@ -180,6 +189,18 @@ AnomalyDetection4Pharma/
 - **Training**: MSE reconstruction loss
 - **Inference**: Threshold-based anomaly detection
 
+### 🛡️ Detection Capabilities
+
+Why a Triple-Detector architecture? Different models excel at different anomaly types:
+
+| Anomaly Type | Isolation Forest | PCA | LSTM-AE (Ours) |
+| :--- | :---: | :---: | :---: |
+| **Point Outliers** (Spikes) | ✅ Detected | ✅ Detected | ✅ Detected |
+| **Concept Drift** (Slow Shift) | ❌ Missed | ⚠️ Partial | ✅ **Detected** |
+| **Pattern Freeze** (Stuck Sensor) | ❌ Missed | ❌ Missed | ✅ **Detected** |
+
+> **Key Takeaway**: The LSTM-AE captures temporal dependencies, enabling it to detect sophisticated failures (Drift/Freeze) that traditional statistical methods miss.
+
 ## 🧰 MLOps Workflows
 
 ### Typical Development Cycle
@@ -285,7 +306,7 @@ This project implements methods from:
 
 ## 📝 License
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## 🙏 Acknowledgments
 
