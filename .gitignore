@@ -44,5 +44,5 @@ logs/
 docs/
 reports/
 
-deployment/
 .streamlit/
+
