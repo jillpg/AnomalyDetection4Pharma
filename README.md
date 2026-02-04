@@ -328,5 +328,5 @@ This project is licensed under the MIT License.
 ## � Author
 
 **Name**: Jill Palma Garro  
-**GitHub**: [@jillpg](https://github.com/jillpg)  
-**LinkedIn**: [jillpg](https://www.linkedin.com/in/jillpg/)
+**GitHub**: [@jpalmagarro](https://github.com/jpalmagarro)  
+**LinkedIn**: [jpalmagarro](https://www.linkedin.com/in/jpalmagarro/)
